@@ -1,0 +1,263 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package Telas;
+
+import Dao.ClienteDao;
+import Dao.QuartoDao;
+import Dao.ReservaDao;
+
+import Model.ClienteModel;
+import Model.QuartoModel;
+import Model.Reserva;
+import Model.UsuarioHospedagem;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author maury
+ */
+public class TelaReserva extends javax.swing.JFrame {
+    
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(TelaReserva.class.getName());
+private UsuarioHospedagem usuarioLogado;
+   Reserva reserva = new Reserva();
+    public TelaReserva(UsuarioHospedagem usuario) {
+        
+        initComponents();
+         this.usuarioLogado = usuario;
+// bloco para formatar os Combox de data
+        try {
+        DataEntrada.setFormatterFactory(
+            new javax.swing.text.DefaultFormatterFactory(
+                new javax.swing.text.MaskFormatter("##/##/####")
+            )
+        );
+
+        DataSaida.setFormatterFactory(
+            new javax.swing.text.DefaultFormatterFactory(
+                new javax.swing.text.MaskFormatter("##/##/####")
+            )
+        );
+        
+        DataEntrada.setFocusLostBehavior(
+        javax.swing.JFormattedTextField.PERSIST
+    );
+
+    DataSaida.setFocusLostBehavior(
+        javax.swing.JFormattedTextField.PERSIST
+    );
+
+    } catch (java.text.ParseException ex) {
+        ex.printStackTrace();
+    }
+        
+
+       
+        carregarcliente();
+        carregarquarto();
+    }
+    
+   private void carregarcliente(){
+       ComboxCliente.removeAllItems(); //limpar o comboxcliente
+       ClienteDao dao =new ClienteDao();
+       for (ClienteModel c : dao.listar()) {
+        ComboxCliente.addItem(c);
+    }
+   }
+   
+   
+   
+   private void carregarquarto(){
+       ComboxQuarto.removeAllItems();//limpar o comboxquaro
+       QuartoDao dao = new QuartoDao();
+       for (QuartoModel q : dao.listar()){
+       ComboxQuarto.addItem(q);
+       }
+   }
+  
+      private void reservar() {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+            // 1. Coleta e valida as datas digitadas nas máscaras
+            Date entrada = sdf.parse(DataEntrada.getText().trim());
+            Date saida = sdf.parse(DataSaida.getText().trim());
+
+            // Validação lógica: a data de saída não pode ser menor ou igual à data de entrada
+            if (!saida.after(entrada)) {
+                JOptionPane.showMessageDialog(this, "A data de saída deve ser posterior à data de entrada!");
+                return;
+            }
+
+            // 2. Coleta os objetos selecionados nos menus drop-down (ComboBox)
+            ClienteModel cliente = (ClienteModel) ComboxCliente.getSelectedItem();
+            QuartoModel quarto = (QuartoModel) ComboxQuarto.getSelectedItem();
+
+            if (cliente == null || quarto == null) {
+                JOptionPane.showMessageDialog(this, "Por favor, selecione um cliente e um quarto válidos.");
+                return;
+            }
+
+            // 3. CONSULTA O BANCO DE DADOS PARA VERIFICAR SE O QUARTO ESTÁ OCUPADO
+            ReservaDao dao = new ReservaDao();
+            boolean quartoOcupado = dao.isQuartoOcupado(quarto.getIdQuarto(), entrada, saida);
+
+            if (quartoOcupado) {
+                // Se o método retornar true, exibe o aviso em amarelo e cancela o salvamento
+                JOptionPane.showMessageDialog(this, 
+                    "O Quarto " + quarto.getNumero() + " já está reservado ou ocupado neste período!", 
+                    "Quarto Indisponível", 
+                    JOptionPane.WARNING_MESSAGE);
+                return; // Corta a execução imediata para não salvar duplicado
+            }
+
+            // 4. SE O QUARTO ESTIVER DISPONÍVEL, REALIZA O CADASTRO NORMALMENTE
+            Reserva r = new Reserva();
+            r.setCliente(cliente);
+            r.setQuarto(quarto);
+            r.setDataentrada(entrada);
+            r.setDatasaida(saida);
+            r.setStatus("RESERVADA");
+
+            dao.salvar(r);
+
+            JOptionPane.showMessageDialog(this, "Reserva realizada com sucesso!");
+            
+            // Limpa os campos de data após salvar para a próxima inserção
+            DataEntrada.setText("");
+            DataSaida.setText("");
+
+        } catch (java.text.ParseException e) {
+            JOptionPane.showMessageDialog(this, "Formato de data inválido! Use o padrão DD/MM/AAAA.");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro inesperado ao realizar reserva: " + e.getMessage());
+        }
+   }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        label1 = new java.awt.Label();
+        ComboxCliente = new javax.swing.JComboBox<>();
+        ComboxQuarto = new javax.swing.JComboBox<>();
+        DataSaida = new javax.swing.JFormattedTextField();
+        DataEntrada = new javax.swing.JFormattedTextField();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+
+        label1.setText("label1");
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        ComboxCliente.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        ComboxCliente.setBorder(null);
+        getContentPane().add(ComboxCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 93, 170, 26));
+
+        ComboxQuarto.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        ComboxQuarto.setBorder(null);
+        getContentPane().add(ComboxQuarto, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 93, 100, 26));
+
+        DataSaida.setBorder(null);
+        DataSaida.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        DataSaida.addActionListener(this::DataSaidaActionPerformed);
+        getContentPane().add(DataSaida, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 270, 180, 26));
+
+        DataEntrada.setBorder(null);
+        DataEntrada.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        DataEntrada.addActionListener(this::DataEntradaActionPerformed);
+        getContentPane().add(DataEntrada, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 205, 180, 27));
+
+        jButton1.setBackground(new java.awt.Color(106, 141, 243));
+        jButton1.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
+        jButton1.setText("Inicio");
+        jButton1.setBorder(null);
+        jButton1.addActionListener(this::jButton1ActionPerformed);
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 400, 50, 30));
+
+        jButton2.setBackground(new java.awt.Color(106, 141, 243));
+        jButton2.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
+        jButton2.setText("Rservar");
+        jButton2.setBorder(null);
+        jButton2.addActionListener(this::jButton2ActionPerformed);
+        getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 400, 90, 30));
+
+        jLabel4.setFont(new java.awt.Font("Segoe UI Light", 0, 18)); // NOI18N
+        jLabel4.setText("Data entrada");
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 200, -1, 30));
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI Light", 0, 18)); // NOI18N
+        jLabel5.setText("Cliente:");
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 90, -1, 30));
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI Light", 0, 18)); // NOI18N
+        jLabel6.setText("Quarto:");
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 90, -1, 30));
+
+        jLabel7.setFont(new java.awt.Font("Segoe UI Light", 0, 18)); // NOI18N
+        jLabel7.setText("Data saida");
+        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 265, -1, 30));
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI Light", 0, 36)); // NOI18N
+        jLabel8.setText("Reserva");
+        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 10, -1, 30));
+
+        jLabel1.setIcon(new javax.swing.ImageIcon("C:\\Users\\maury\\OneDrive\\Documentos\\NetBeansProjects\\ProjetoIntegradorUC15\\src\\main\\java\\Telas\\IMGReserva.png")); // NOI18N
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 530, -1));
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void DataSaidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DataSaidaActionPerformed
+     
+    }//GEN-LAST:event_DataSaidaActionPerformed
+
+    private void DataEntradaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DataEntradaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_DataEntradaActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        reservar();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+       Principal principal  = new Principal(usuarioLogado );
+       principal.setVisible(true);
+    
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+   
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<ClienteModel> ComboxCliente;
+    private javax.swing.JComboBox<QuartoModel> ComboxQuarto;
+    private javax.swing.JFormattedTextField DataEntrada;
+    private javax.swing.JFormattedTextField DataSaida;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private java.awt.Label label1;
+    // End of variables declaration//GEN-END:variables
+}
