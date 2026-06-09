@@ -14,7 +14,13 @@ PRINCIPAIS TECNOLOGIAS
 
 
 
-&#x20;java GIT e GitHub.
+&#x20;
+Java linguagem de programação principal.
+Java Swing (desenvolvimento da interface gráfica).
+MySQL banco de dados relacional para armazenamento das informações.
+JDBC conexão entre a aplicação Java e o banco de dados MySQL.
+Apache NetBeans ambiente de desenvolvimento (IDE).
+Git e GitHub  versionamento e hospedagem do código-fonte.
 
 
 
